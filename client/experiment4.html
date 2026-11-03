@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Connect - Academic Task & Study Planner</title>
+
+  <style>
+    :root {
+      --primary: #0A2240;
+      --accent: #F2A900;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app-container {
+      max-width: 650px;
+      margin: 30px auto;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-header {
+      margin-bottom: 20px;
+    }
+
+    .nav-header a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .nav-header a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      margin: 0 0 6px 0;
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    .subtitle {
+      color: #64748b;
+      margin: 0 0 25px 0;
+      font-size: 14px;
+    }
+
+    /* State Stats Bar */
+    .state-stats {
+      display: flex;
+      justify-content: space-between;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .stat-item strong {
+      color: var(--primary);
+    }
+
+    /* Input Form */
+    .task-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .task-input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .task-input:focus {
+      border-color: var(--primary);
+    }
+
+    .priority-select {
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    .btn-add {
+      background: var(--primary);
+      color: var(--accent);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-add:hover {
+      opacity: 0.92;
+    }
+
+    /* Filter Controls */
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Task List */
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: 6px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .task-card.priority-High {
+      border-left-color: #ef4444;
+    }
+
+    .task-card.priority-Medium {
+      border-left-color: #f59e0b;
+    }
+
+    .task-card.priority-Low {
+      border-left-color: #10b981;
+    }
+
+    .task-card.completed {
+      background: #f8fafc;
+      opacity: 0.7;
+    }
+
+    .task-card.completed .task-title {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .task-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .task-title {
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .priority-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .badge-High { background: #fee2e2; color: #dc2626; }
+    .badge-Medium { background: #fef3c7; color: #d97706; }
+    .badge-Low { background: #dcfce7; color: #16a34a; }
+
+    .btn-delete {
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .btn-delete:hover {
+      color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <div class="nav-header">
+      <a href="index.html">← Return to Campus Connect</a>
+    </div>
+
+    <h1>📋 Student Study & Task Planner</h1>
+    <p class="subtitle">State-driven interactive academic manager with version control tracking.</p>
+
+    <!-- State Driven Stats Bar -->
+    <div class="state-stats" id="statsBar">
+      <span class="stat-item">Total Tasks: <strong id="totalCount">0</strong></span>
+      <span class="stat-item">Completed: <strong id="completedCount">0</strong></span>
+      <span class="stat-item">Pending: <strong id="pendingCount">0</strong></span>
+    </div>
+
+    <!-- Input Form to Mutate State -->
+    <form id="taskForm" class="task-form" onsubmit="handleAddTask(event)">
+      <input
+        type="text"
+        id="taskInput"
+        class="task-input"
+        placeholder="Enter academic task (e.g., CS3301 Module 2 Revision)..."
+        required
+      >
+      <select id="prioritySelect" class="priority-select">
+        <option value="High">High</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <button type="submit" class="btn-add">Add Task</button>
+    </form>
+
+    <!-- Filter Buttons (State: filter) -->
+    <div class="filter-group">
+      <button type="button" class="filter-btn active" onclick="setFilter('all', this)">All Tasks</button>
+      <button type="button" class="filter-btn" onclick="setFilter('pending', this)">Pending</button>
+      <button type="button" class="filter-btn" onclick="setFilter('completed', this)">Completed</button>
+    </div>
+
+    <!-- Dynamic Container rendered from State -->
+    <ul id="taskList" class="task-list">
+      <!-- Generated entirely by render() from state -->
+    </ul>
+
+  </div>
+
+  <!-- External Script containing State Machine & Render Loop -->
+  <script src="experiment4.js"></script>
+</body>
+</html>

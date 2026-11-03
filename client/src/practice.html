@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Portal - Student Challenge</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f9; color: #333; }
+    .container { max-width: 650px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .card { border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 15px; border-radius: 6px; background: #fafafa; }
+    button { background: #007bff; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🎓 Student Performance Portal</h2>
+    <p>Complete the TODOs in the script tag below!</p>
+
+    <!-- Task 1 -->
+    <div class="card">
+      <h3>1. Student Summary (Variables, Types & Operators)</h3>
+      <button onclick="displaySummary()">Load Student Profile</button>
+      <div id="profileOutput" style="margin-top: 10px;">Click button to display...</div>
+    </div>
+
+    <!-- Task 2 -->
+    <div class="card">
+      <h3>2. Batch Grade Evaluator (Loops & Switch)</h3>
+      <button onclick="evaluateScores()">Evaluate Batch Marks</button>
+      <div id="batchOutput" style="margin-top: 10px;"></div>
+    </div>
+
+    <!-- Task 3 -->
+    <div class="card">
+      <h3>3. Attendance Counter (Closure & Arrow Function)</h3>
+      <button id="attendanceBtn">Mark Present (+1)</button>
+      <p id="attendanceDisplay">Total Attendance: 0</p>
+    </div>
+
+    <!-- Task 4 -->
+    <div class="card">
+      <h3>4. Quick Alerts & Navigation</h3>
+      <button onclick="triggerAlerts()">Send Announcement</button>
+      <p><a href="page2.html">Go to Registration Form →</a></p>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // TASK 1: Variables, Data Types & Operators
+    // ==========================================
+    function displaySummary() {
+      // TODO: Create a string variable for studentName
+      let studentName = "Suresh"; 
+      // TODO: Create a number variable for marks (e.g., 85)
+      let marks = 85;
+      // TODO: Create an object for studentInfo containing an 'id' property
+      let studentInfo = { id: 101 };
+      // TODO: Calculate totalMarks by adding 5 bonus marks to marks
+      let totalMarks = marks + 5;
+      // TODO: Use a ternary operator to set status to "PASS" if totalMarks >= 40, else "FAIL"
+      let status = totalMarks >= 40 ? "PASS" : "FAIL";
+
+      // TODO: Update the innerHTML of element 'profileOutput' with the student name, score, and status
+      document.getElementById("profileOutput").innerHTML = `Name: ${studentName}, Score: ${totalMarks}, Status: ${status}`;
+    }
+
+    // ==========================================
+    // TASK 2: Control Flow (Loops & Switch)
+    // ==========================================
+    function evaluateScores() {
+      let scores = [92, 45, 35, 78, 88];
+      let output = document.getElementById("batchOutput");
+      output.innerHTML = ""; // Clear previous content
+
+      // TODO: Write a for loop to iterate through the scores array
+      for (let i = 0; i < scores.length; i++) {
+        let score = scores[i];
+      // TODO: Inside loop, if score === 35, use 'continue' to skip that student
+        if (score === 35) {
+          continue; // Skip this score
+        }
+
+        let gradeCateg;
+      // TODO: Use a switch statement to assign grades:
+      switch (true) {
+        case (score >= 90):
+          gradeCateg = "Grade A (Excellent)";
+          break;
+        case (score >= 70):
+          gradeCateg = "Grade B (Good)";
+          break;
+        default:
+          gradeCateg = "Grade C (Average)";
+      }
+
+      // >= 90: "Grade A", >= 70: "Grade B", default: "Grade C"
+      
+      // TODO: Append each result to output.innerHTML
+      output.innerHTML += `Score: ${score} - ${gradeCateg}<br>`;
+      }
+    }
+
+    // ==========================================
+    // TASK 3: Closures & Arrow Functions
+    // ==========================================
+    // TODO: Write an outer function 'createTracker()' that declares a local variable 'count = 0'
+    // TODO: Return an inner function that increments 'count' and returns it
+    
+    // TODO: Store the returned function instance in a constant variable
+
+    // TODO: Attach a click event or arrow function to update #attendanceDisplay using innerText
+    document.getElementById("attendanceBtn").onclick = () => {
+      // Call your closure function here and update element 'attendanceDisplay'
+    };
+
+    // ==========================================
+    // TASK 4: Popup Boxes
+    // ==========================================
+    function triggerAlerts() {
+      // TODO: Display an alert() message
+      // TODO: Ask user confirmation using confirm()
+      // TODO: If confirmed, collect user input using prompt() and alert it back
+    }
+  </script>
+
+</body>
+</html>
