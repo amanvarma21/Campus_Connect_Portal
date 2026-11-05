@@ -673,3 +673,9 @@ body {
 .btn-delete-item:hover {
   background: #dc2626;
 }
+
+.assignment-input::-webkit-calendar-picker-indicator {
+  filter: brightness(0);
+  opacity: 0.8;
+  cursor: pointer;
+}

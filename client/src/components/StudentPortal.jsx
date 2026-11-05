@@ -58,6 +58,40 @@ export default function StudentPortal({ onBackToHome }) {
       .catch((err) => console.error('Error undoing assignment:', err));
   };
 
+  // Create a new assignment via API
+const handleCreateAssignment = (newAssignment) => {
+  fetch('http://localhost:5000/api/assignments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newAssignment)
+  })
+    .then((res) => res.json())
+    .then((createdAssignment) => {
+      setAssignments((prev) => [...prev, createdAssignment]);
+    })
+    .catch((err) => console.error('Error creating assignment:', err));
+};
+
+// Delete assignment via API
+const handleDeleteAssignment = (id) => {
+  if (!window.confirm("Are you sure you want to delete this assignment?")) {
+    return;
+  }
+
+  fetch(`http://localhost:5000/api/assignments/${id}`, {
+    method: 'DELETE'
+  })
+    .then((res) => res.json())
+    .then(() => {
+      setAssignments((prev) =>
+        prev.filter((item) => item.id !== id)
+      );
+    })
+    .catch((err) => console.error('Error deleting assignment:', err));
+};
+
   const pendingCount = assignments.filter((a) => a.status === 'Pending').length;
 
   return (
@@ -66,7 +100,7 @@ export default function StudentPortal({ onBackToHome }) {
       <header style={styles.header}>
         <div>
           <h2 style={{ margin: 0, color: '#F2A900', fontSize: '20px' }}>👨‍🎓 Student Portal View</h2>
-          <span style={{ fontSize: '13px', color: '#e0e0e0' }}>Welcome, Abhimanyu Kintali (1RVU24CSE001)</span>
+          <span style={{ fontSize: '13px', color: '#e0e0e0' }}>Welcome, Aman S Varma (1RVUA24SCS0007)</span>
         </div>
         <button onClick={onBackToHome} style={styles.backBtn}>
           ← Back to Main Campus View
@@ -138,6 +172,8 @@ export default function StudentPortal({ onBackToHome }) {
             assignments={assignments}
             onSubmit={handleAssignmentSubmit}
             onUndo={handleUndo}
+            onCreate={handleCreateAssignment}
+            onDelete={handleDeleteAssignment}
           />
         )}
 
@@ -155,7 +191,7 @@ function DashboardView({ pendingCount, noticesCount, eventsCount, setActiveTab }
     <div>
       <h3 style={{ margin: '0 0 6px 0', color: '#0A2240' }}>🎓 Student Academic Dashboard</h3>
       <p style={{ color: '#777', fontSize: '13px', margin: '0 0 20px 0' }}>
-        B.Tech (Hons.) Computer Science • Batch 2024 • RV University
+        BSc (Hons.) Computer Science • Batch 2024 • RV University
       </p>
 
       <div style={styles.statsGrid}>
@@ -245,13 +281,58 @@ function EventsView({ events }) {
 }
 
 // 4. Assignments View
-function AssignmentsView({ assignments, onSubmit, onUndo }) {
+function AssignmentsView({ assignments, onSubmit, onUndo, onCreate, onDelete }) {
   return (
     <div>
       <h3 style={{ margin: '0 0 4px 0', color: '#0A2240' }}>📝 Submit Assignments</h3>
       <p style={{ color: '#777', fontSize: '13px', margin: '0 0 15px 0' }}>
         Coursework tasks, laboratory assignments, and project submissions
       </p>
+
+<form
+  onSubmit={(e) => {
+    e.preventDefault();
+
+    const newAssignment = {
+      subject: e.target.subject.value,
+      title: e.target.title.value,
+      dueDate: e.target.dueDate.value
+    };
+
+    onCreate(newAssignment);
+    e.target.reset();
+  }}
+  style={styles.createForm}
+>
+  <h4 style={{ color: '#0A2240', marginTop: 0 }}>
+    Add New Assignment
+  </h4>
+
+  <input
+    name="subject"
+    placeholder="Subject"
+    required
+    style={styles.formInput}
+  />
+
+  <input
+    name="title"
+    placeholder="Assignment Title"
+    required
+style={styles.formInput}  />
+
+<input
+  name="dueDate"
+  type="date"
+  required
+  className="assignment-input"
+  style={styles.formInput}
+/>
+
+<button type="submit" style={styles.addAssignmentBtn}>
+  + Add Assignment
+</button>
+</form>
 
       <ul style={styles.list}>
         {assignments.map((item) => (
@@ -260,20 +341,33 @@ function AssignmentsView({ assignments, onSubmit, onUndo }) {
               <strong style={{ fontSize: '15px' }}>{item.title}</strong>
               <p style={styles.subText}>{item.subject} • Due: {item.dueDate}</p>
             </div>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              {item.status === 'Submitted' ? (
-                <>
-                  <span style={styles.badgeSubmitted}>Submitted</span>
-                  <button style={styles.btnUndo} onClick={() => onUndo(item.id)}>
-                    Undo
-                  </button>
-                </>
-              ) : (
-                <button style={styles.btnSubmit} onClick={() => onSubmit(item.id)}>
-                  Submit
-                </button>
-              )}
-            </div>
+<div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+  {item.status === 'Submitted' ? (
+    <>
+      <span style={styles.badgeSubmitted}>Submitted</span>
+      <button
+        style={styles.btnUndo}
+        onClick={() => onUndo(item.id)}
+      >
+        Undo
+      </button>
+    </>
+  ) : (
+    <button
+      style={styles.btnSubmit}
+      onClick={() => onSubmit(item.id)}
+    >
+      Submit
+    </button>
+  )}
+
+  <button
+    style={styles.btnDelete}
+    onClick={() => onDelete(item.id)}
+  >
+    Delete
+  </button>
+</div>
           </li>
         ))}
       </ul>
@@ -288,12 +382,12 @@ function AttendanceView() {
       <h3 style={{ margin: '0 0 15px 0', color: '#0A2240' }}>📊 View Attendance</h3>
       <div style={styles.statsGrid}>
         <div style={styles.statBox}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>CS3301 - Full Stack</h4>
-          <h2 style={{ color: '#0A2240', margin: 0 }}>88%</h2>
+          <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>CS2025 - Full Stack</h4>
+          <h2 style={{ color: '#0A2240', margin: 0 }}>98%</h2>
         </div>
         <div style={styles.statBox}>
-          <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>CS3302 - DBMS</h4>
-          <h2 style={{ color: '#0A2240', margin: 0 }}>92%</h2>
+          <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>CS2026 - NLP</h4>
+          <h2 style={{ color: '#0A2240', margin: 0 }}>97%</h2>
         </div>
       </div>
     </div>
@@ -306,10 +400,10 @@ function ProfileView() {
     <div>
       <h3 style={{ margin: '0 0 15px 0', color: '#0A2240' }}>👤 Update Profile</h3>
       <div style={{ lineHeight: '2', color: '#333', fontSize: '14px' }}>
-        <p><strong>Name:</strong> Abhimanyu Kintali</p>
-        <p><strong>Student ID:</strong> 1RVU24CSE001</p>
+        <p><strong>Name:</strong> Aman S Varma</p>
+        <p><strong>Student ID:</strong> 1RUA24SCS0007</p>
         <p><strong>Department:</strong> School of Computer Science & Engineering (SOCSE)</p>
-        <p><strong>Course:</strong> B.Tech (Hons.) Computer Science</p>
+        <p><strong>Course:</strong> BSc (Hons.) Computer Science</p>
         <p><strong>Status:</strong> Active Enrolled</p>
       </div>
     </div>
@@ -478,5 +572,56 @@ const styles = {
     borderRadius: '4px',
     fontSize: '12px',
     fontWeight: 'bold'
-  }
+  },
+  createForm: {
+  backgroundColor: '#f8fafc',
+  border: '1px solid #e0e6ed',
+  borderRadius: '10px',
+  padding: '20px',
+  marginBottom: '25px',
+  boxShadow: '0 3px 10px rgba(0,0,0,0.04)'
+},
+
+formHeading: {
+  color: '#0A2240',
+  marginTop: 0,
+  marginBottom: '18px',
+  fontSize: '17px'
+},
+
+formInput: {
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '12px',
+  marginBottom: '14px',
+  border: '1px solid #060606',
+  borderRadius: '6px',
+  fontSize: '14px',
+  color: '#222222',
+  caretColor: '#0A2240',
+  backgroundColor: '#ffffff',
+  outline: 'none'
+},
+
+addAssignmentBtn: {
+  backgroundColor: '#F2A900',
+  color: '#0A2240',
+  border: 'none',
+  padding: '11px 18px',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  fontWeight: 'bold',
+  fontSize: '14px'
+},
+
+btnDelete: {
+  backgroundColor: '#dc3545',
+  color: '#ffffff',
+  border: 'none',
+  padding: '6px 12px',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  fontSize: '12px',
+  fontWeight: 'bold'
+}
 };
