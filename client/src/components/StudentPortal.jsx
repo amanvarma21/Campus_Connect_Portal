@@ -1,16 +1,22 @@
 import { useState, useEffect } from 'react';
+import {
+  getAssignments,
+  createAssignment,
+  submitAssignment,
+  undoSubmission,
+  deleteAssignment
+} from '../services';
 
 export default function StudentPortal({ onBackToHome }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [assignments, setAssignments] = useState([]);
 
   // Fetch live assignments from Express API when component mounts
-  useEffect(() => {
-    fetch('http://localhost:5000/api/assignments')
-      .then((res) => res.json())
-      .then((data) => setAssignments(data))
-      .catch((err) => console.error('Error fetching assignments:', err));
-  }, []);
+useEffect(() => {
+  getAssignments()
+    .then((data) => setAssignments(data))
+    .catch((err) => console.error('Error fetching assignments:', err));
+}, []);
 
   const notices = [
     { id: 1, title: 'Mid-Term Exam Schedule Released', date: 'Sept 10, 2026', dept: 'SOCSE' },
@@ -25,49 +31,34 @@ export default function StudentPortal({ onBackToHome }) {
   ];
 
   // Submit assignment via API
-  const handleAssignmentSubmit = (id) => {
-    fetch(`http://localhost:5000/api/assignments/${id}/submit`, {
-      method: 'PUT'
+const handleAssignmentSubmit = (id) => {
+  submitAssignment(id)
+    .then((updatedAssignment) => {
+      setAssignments((prev) =>
+        prev.map((item) =>
+          item.id === id ? updatedAssignment : item
+        )
+      );
     })
-      .then((res) => res.json())
-      .then((updatedAssignment) => {
-        setAssignments(
-          assignments.map((item) =>
-            item.id === id ? updatedAssignment : item
-          )
-        );
-      })
-      .catch((err) => console.error('Error submitting assignment:', err));
-  };
+    .catch((err) => console.error('Error submitting assignment:', err));
+};
 
-  // Undo submission via API
-  const handleUndo = (id) => {
-    fetch(`http://localhost:5000/api/assignments/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'Pending' })
+// Undo submission via API
+const handleUndo = (id) => {
+  undoSubmission(id)
+    .then((updatedAssignment) => {
+      setAssignments((prev) =>
+        prev.map((item) =>
+          item.id === id ? updatedAssignment : item
+        )
+      );
     })
-      .then((res) => res.json())
-      .then((updatedAssignment) => {
-        setAssignments(
-          assignments.map((item) =>
-            item.id === id ? updatedAssignment : item
-          )
-        );
-      })
-      .catch((err) => console.error('Error undoing assignment:', err));
-  };
+    .catch((err) => console.error('Error undoing assignment:', err));
+};
 
-  // Create a new assignment via API
+// Create a new assignment via API
 const handleCreateAssignment = (newAssignment) => {
-  fetch('http://localhost:5000/api/assignments', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newAssignment)
-  })
-    .then((res) => res.json())
+  createAssignment(newAssignment)
     .then((createdAssignment) => {
       setAssignments((prev) => [...prev, createdAssignment]);
     })
@@ -80,10 +71,7 @@ const handleDeleteAssignment = (id) => {
     return;
   }
 
-  fetch(`http://localhost:5000/api/assignments/${id}`, {
-    method: 'DELETE'
-  })
-    .then((res) => res.json())
+  deleteAssignment(id)
     .then(() => {
       setAssignments((prev) =>
         prev.filter((item) => item.id !== id)
