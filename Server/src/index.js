@@ -1,4 +1,4 @@
-const { startServer } = require("./app");
+const { startServer } = require("./src/app");
 
 startServer().catch((error) => {
   console.error(`Server startup failed: ${error.message}`);
